@@ -3,5 +3,16 @@
 {% block title %} Articles{% endblock %}
 
 {% block main %}
-Nejaké tie articles :)
+    {% if articles %}
+        <ul>
+        {% for id, article in articles %}
+            <li>   
+                <h2> <a href="{{ url_for("view_article", art_id=id) }}"> {{ article.title }} </a> </h2>
+                <p> {{article.content | truncate(100) }} {# truncate, max.dlžka stringu a pridá na koniec ... #} 
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p> Žiadne články nemáme :( </>
+    {% endif %}
 {% endblock %}
