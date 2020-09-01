@@ -1,17 +1,18 @@
 from flask import Flask, render_template
-from .database import articles
 from flask import g
 import sqlite3
+import os #pre congigs
 from flask import request ##pre login
 from flask import redirect ##pre login 
 from flask import url_for
 from flask import session ## umožnuje prácu s cookies pre indentifikáciu usera
 
-DATABASE = "/vagrant/blog.db"
-
 flask_app = Flask(__name__)
-flask_app.secret_key = b'\x1b\n\xc8\xa0\xcf\xd1\xear\x7f\xf3\xeas$\x05\xd1\xf7[!\x17\xd4\xab!p\xda' ##šifra cookies na strane klienta
 
+flask_app.config.from_pyfile("/vagrant/configs/default.py")
+
+if "MDBLOG_CONFIG" in os.environ:
+    flask_app.config.from_envvar("MDBLOG_CONFIG")
 
 @flask_app.route('/')
 def view_welcome_page():
@@ -27,13 +28,28 @@ def view_admin():
         return redirect(url_for("view_login"))
     return render_template("admin.jinja")
 
-@flask_app.route('/articles/')
+## s metódou GET na čítanie článkov
+@flask_app.route('/articles/', methods=["GET"])
 def view_articles():
-    return render_template("articles.jinja", articles=articles.items())
+    db = get_db()
+    cur = db.execute("select * from articles order by id desc") ##cur = cursor
+    articles = cur.fetchall()
+    return render_template("articles.jinja", articles=articles)
+
+## s metódou POST na pridanie článku
+@flask_app.route('/articles/', methods=["POST"])
+def add_article():
+    db = get_db()
+    db.execute("insert into articles (title, content) values (?, ?)", [request.form.get("title"), request.form.get("content")])
+    db.commit()
+    return redirect(url_for("view_articles"))
+
 
 @flask_app.route('/articles/<int:art_id>/')
 def view_article(art_id):
-    article = articles.get(art_id)
+    db = get_db()
+    cur = db.execute("select * from articles where id=(?)",[art_id])
+    article = cur.fetchone() ##iba 1 článok
     if article:
         return render_template("article.jinja", article=article)
     return render_template("article_not_found.jinja", art_id=art_id)
@@ -46,7 +62,7 @@ def view_login():
 def login_user():
     username = request.form["username"]
     password = request.form["password"]
-    if username == "admin" and password == "admin":
+    if username == flask_app.config["USERNAME"] and password == flask_app.config["PASSWORD"]:
         session["logged"] = True
         return redirect(url_for("view_admin"))
     else:
@@ -60,7 +76,7 @@ def logout_user():
 
 ## UTILS (connect databazy)
 def connect_db():
-    rv = sqlite3.connect(DATABASE)
+    rv = sqlite3.connect(flask_app.config["DATABASE"])
     rv.row_factory = sqlite3.Row ## .Row upraví súrovú db do python dictionary
     return rv
 
