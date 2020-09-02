@@ -1,11 +1,14 @@
 from flask import Flask, render_template
 from flask import g
-import sqlite3
-import os #pre congigs
+
 from flask import request ##pre login
 from flask import redirect ##pre login 
 from flask import url_for
 from flask import session ## umožnuje prácu s cookies pre indentifikáciu usera
+from flask import flash
+
+import sqlite3
+import os #pre congigs
 
 flask_app = Flask(__name__)
 
@@ -22,9 +25,11 @@ def view_welcome_page():
 def view_about():
     return render_template("about.jinja")
 
+## Adminpage
 @flask_app.route('/admin/')
 def view_admin():
     if "logged" not in session: ## ak nie som lognutý
+        flash(u"You must be logged in", "danger")
         return redirect(url_for("view_login"))
     return render_template("admin.jinja")
 
@@ -42,9 +47,10 @@ def add_article():
     db = get_db()
     db.execute("insert into articles (title, content) values (?, ?)", [request.form.get("title"), request.form.get("content")])
     db.commit()
+    flash(u"Article was added", category="alert-success")
     return redirect(url_for("view_articles"))
 
-
+##Zobrazenie article
 @flask_app.route('/articles/<int:art_id>/')
 def view_article(art_id):
     db = get_db()
@@ -58,19 +64,24 @@ def view_article(art_id):
 def view_login():
     return render_template("login.jinja")
 
+##LOG IN
 @flask_app.route('/login/', methods=["POST"])
 def login_user():
     username = request.form["username"]
     password = request.form["password"]
     if username == flask_app.config["USERNAME"] and password == flask_app.config["PASSWORD"]:
         session["logged"] = True
+        flash(u"Login succesfull", category="success")
         return redirect(url_for("view_admin"))
     else:
+        flash("Invalid username or password", category="danger")
         return redirect(url_for("view_login"))
 
+##LOGOUT
 @flask_app.route('/logout/', methods=["POST"])
 def logout_user():
     session.pop("logged")
+    flash(u"You had been logged out", category="success")
     return redirect(url_for("view_welcome_page"))
 
 
