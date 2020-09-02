@@ -42,3 +42,10 @@ footer {
     width: 100%;
     font-size: 30px;
 }
+
+.error-login-form {
+    background: red;
+    text-align: center;
+    width: 100%;
+    font-size: 30px;
+}

@@ -4,5 +4,9 @@
 
 {% block main %}
     <h2> {{ article.title }} </h2>
-    <p> {{ article.content }} </>
+    <p> {{ article.content }} </p>
+    {% if "logged" in session %}
+<button> <a href="{{ url_for("view_article_editor", art_id=article.id) }}"> Edit article </a></button>
+{% endif %}
 {% endblock %}
+
