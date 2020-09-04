@@ -15,6 +15,8 @@ from wtforms.validators import InputRequired
 ## pre DB
 from .models import db
 from .models import Article 
+from .models import User
+
 
 import os #pre congigs
 
@@ -33,6 +35,11 @@ class loginForm(FlaskForm):
 class articleForm(FlaskForm):
     title = StringField("Title", validators=[InputRequired()])
     content = TextAreaField("Content")
+
+class changePasswordForm(FlaskForm):
+    old_password = StringField("Old_assword", validators=[InputRequired()])
+    new_password = PasswordField("New_Password", validators=[InputRequired()])
+
 
 ## CONTROLLERS
 @flask_app.route('/')
@@ -129,8 +136,9 @@ def view_login():
 def login_user():
     login_form = loginForm(request.form) ## inštancia formuláru loginForm
     if login_form.validate(): ##ak sú obe polia vyplnené
-        if login_form.username.data == flask_app.config["USERNAME"] and login_form.password.data == flask_app.config["PASSWORD"]:
-            session["logged"] = True
+        user = User.query.filter_by(username = login_form.username.data).first()
+        if user and user.check_password(login_form.password.data):
+            session["logged"] = user.username
             flash("Login succesfull", category="success")
             return redirect(url_for("view_admin"))
         else:
@@ -140,6 +148,29 @@ def login_user():
         for error in login_form.errors:
             flash("{} is missing".format(error), "danger")
         return redirect(url_for("view_login"))
+
+## CHANGE PASSWORD
+@flask_app.route("/changepassword/", methods=["GET"])
+def view_change_password():
+    if "logged" not in session:
+        return redirect(url_for("view_login"))
+    form = changePasswordForm()
+    return render_template("change_password.jinja", form=form)
+
+@flask_app.route("/changepassword/", methods=["POST"])
+def change_password():
+    if "logged" not in session:
+        return redirect(url_for("view_login"))
+    form = changePasswordForm(request.form)
+    if form.validate():
+        user = User.query.filter_by(username = session["logged"]).first()
+        if user and user.check_password(form.old_password.data):
+            user.set_password(form.new_password.data)
+            db.session.add(user)
+            db.session.commit()
+            flash("Password was changed", category="success")
+            return redirect(url_for("view_admin"))
+
 
 ##LOGOUT
 @flask_app.route('/logout/', methods=["POST"])
@@ -156,3 +187,8 @@ def init_db(app):
             db.create_all()
             print("Database inicialized")
 
+            default_user = User(username="admin")
+            default_user.set_password("admin")
+            db.session.add(default_user)
+            db.session.commit()
+            print("default user was created")
