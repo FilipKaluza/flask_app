@@ -49,3 +49,8 @@ footer {
     width: 100%;
     font-size: 30px;
 }
+
+.internalerror {
+    background: gray;
+    text-align: center;
+}

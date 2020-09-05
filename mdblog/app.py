@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from .models import db
 from .mod_main.controller import main
 from .mod_blog.controller import blog
@@ -17,6 +17,18 @@ db.init_app(flask_app) ##inicializácia db
 flask_app.register_blueprint(main)
 flask_app.register_blueprint(blog)
 flask_app.register_blueprint(admin)
+
+
+## ERROR handler
+@flask_app.errorhandler(500)
+def Internal_server_error(error):
+    return render_template("errors/500.jinja"), 500
+
+@flask_app.errorhandler(404)
+def Internal_server_error(error):
+    return render_template("errors/404.jinja"), 404
+
+
 
 ## CLI COMMAND
 

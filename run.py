@@ -6,7 +6,7 @@ import sys
 def start():
     debug = False
     host = "0.0.0.0"
-    flask_app.run(host, debug=True)
+    flask_app.run(host, debug=debug)
 
 def init():
     init_db(flask_app)
