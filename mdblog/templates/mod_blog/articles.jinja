@@ -4,13 +4,13 @@
 
 {% block main %}
     {% if "logged" in session %}
-<button> <a href="{{ url_for("view_add_article") }}"> Add new article </a></button>
+<button> <a href="{{ url_for("admin.view_add_article") }}"> Add new article </a></button>
     {% endif %}
     {% if articles %}
         <ul>
         {% for article in articles %}
             <li>   
-                <h2> <a href="{{ url_for("view_article", art_id=article.id) }}"> {{ article.title }} </a> </h2>
+                <h2> <a href="{{ url_for("admin.view_add_article", art_id=article.id) }}"> {{ article.title }} </a> </h2>
                 <p> {{article.content | truncate(100) }} {# truncate, max.dlžka stringu a pridá na koniec ... #} 
             </li>
         {% endfor %}
