@@ -54,3 +54,17 @@ footer {
     background: gray;
     text-align: center;
 }
+
+/* for pagination */
+.paginate {
+    text-align: center;
+}
+
+.paginate li {
+    padding-top: 20px;
+    text-align: center;
+    display: inline-block;
+    font-size: 40px;
+    color: gray;
+    
+}
