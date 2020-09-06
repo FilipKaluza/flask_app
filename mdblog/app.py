@@ -16,7 +16,7 @@ db.init_app(flask_app) ##inicializácia db
 
 flask_app.register_blueprint(main)
 flask_app.register_blueprint(blog)
-flask_app.register_blueprint(admin)
+flask_app.register_blueprint(admin, url_prefix="/admin") ## všetko podurl bude za /admin
 
 
 ## ERROR handler

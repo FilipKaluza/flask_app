@@ -6,7 +6,6 @@ from flask import url_for
 from flask import session ## umožnuje prácu s cookies pre indentifikáciu usera
 from flask import flash
 
-
 ## pre DB
 from mdblog.models import db
 from mdblog.models import Article 
@@ -17,28 +16,39 @@ admin = Blueprint("admin", __name__)
 ## FORMS
 from .forms import ArticleForm, loginForm, changePasswordForm
 
+##for @login_required 
+from functools import wraps
+def login_required(func):
+    @wraps(func)
+    def decorated_function(*args, **kwargs):
+        if "logged" not in session:
+            flash("You must be logged in", "alert-danger")
+            return redirect(url_for("admin.view_login"))
+        return func(*args, **kwargs)
+    return decorated_function
 
 ## Adminpage
-@admin.route('/admin/')
+@admin.route('/')
+@login_required
 def view_admin():
-    if "logged" not in session: ## ak nie som lognutý
-        flash(u"You must be logged in", "danger")
-        return redirect(url_for("admin.view_login"))
-    return render_template("mod_admin/admin.jinja")
+    page=request.args.get("page", 1, type=int)
+    paginate = Article.query.order_by(Article.id.desc()).paginate(
+            page, 3, False)
+    return render_template("mod_admin/admin.jinja",
+            articles=paginate.items, 
+            paginate=paginate)
 
 @admin.route('/articles/new/', methods=["GET"])
+@login_required
 def view_add_article():
-    if "logged" not in session:
-        return redirect(url_for("mod_admin/view_login"))
     form = ArticleForm()
     return render_template("mod_admin/article_editor.jinja", form=form)
 
 
 ## s metódou POST na pridanie článku
 @admin.route('/articles/', methods=["POST"])
+@login_required
 def add_article():
-    if "logged" not in session:
-        return redirect(url_for("mod_admin/view_login"))
     add_form = ArticleForm(request.form)
     if add_form.validate():
         new_article = Article(
@@ -51,9 +61,8 @@ def add_article():
 
 ## editácia article
 @admin.route('/articles/<int:art_id>/edit/', methods=["GET"])
+@login_required
 def view_article_editor(art_id):
-    if "logged" not in session:
-        return redirect(url_for("admin.view_login"))
     article = Article.query.filter_by(id = art_id).first()
     if article:
         form = articleForm()
@@ -64,9 +73,8 @@ def view_article_editor(art_id):
 
 
 @admin.route('/articles/<int:art_id>/', methods=["POST"])
+@login_required
 def edit_article(art_id):
-    if "logged" not in session:
-        return redirect(url_for("mod_admin/view_login"))
     article = Article.query.filter_by(id = art_id).first()
     if article:
         edit_form = articleForm(request.form)
@@ -81,16 +89,14 @@ def edit_article(art_id):
 
 ## CHANGE PASSWORD
 @admin.route("/changepassword/", methods=["GET"])
+@login_required
 def view_change_password():
-    if "logged" not in session:
-        return redirect(url_for("admin.view_login"))
     form = changePasswordForm()
     return render_template("mod_admin/change_password.jinja", form=form)
 
 @admin.route("/changepassword/", methods=["POST"])
+@login_required
 def change_password():
-    if "logged" not in session:
-        return redirect(url_for("admin.view_login"))
     form = changePasswordForm(request.form)
     if form.validate():
         user = User.query.filter_by(username = session["logged"]).first()

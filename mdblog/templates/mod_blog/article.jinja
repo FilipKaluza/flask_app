@@ -3,10 +3,14 @@
 {% block title %} Article {{article.title}} {% endblock %}
 
 {% block main %}
-    <h2> {{ article.title }} </h2>
-    <p> {{ article.content }} </p>
-    {% if "logged" in session %}
-<button> <a href="{{ url_for("admin.view_article_editor", art_id=article.id) }}"> Edit article </a></button>
+    <article>
+        <h1>
+            {{ article.title }}
+        </h1>
+        <div class=content>
+            {{ article.content }}
+        </div>
+    </article>
 {% endif %}
 {% endblock %}
 

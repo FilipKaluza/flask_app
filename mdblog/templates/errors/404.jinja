@@ -3,8 +3,19 @@
 {% block title %} ERROR {% endblock %}
 
 {% block main %}
-    <div class="internalerror">
-        <h1> Ups, page not found ! Please contact IT Department at</h1>
-        <h2>kaluzafilip33@gmail.com </h2>
+    <div class="row ">
+    <div class="col-md-12">
+        <div class="error-template">
+            <h1>Oops!</h1>
+            <h2>404 Page not found</h2>
+            <div class="error-details">
+                Unfortunately this pages doesn't exist.
+            </div>
+            <div class="error-actions">
+                <a href="/" class="btn btn-primary btn-lg"> Home </a>
+                <a href="mailto:admin@blabla.sk" class="btn btn-default btn-lg"> Support </a>
+            </div>
+        </div>
     </div>
+</div>
 {% endblock %}

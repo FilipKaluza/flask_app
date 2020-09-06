@@ -3,48 +3,59 @@
 {% block title %} Articles{% endblock %}
 
 {% block main %}
-    {% if "logged" in session %}
-<button> <a href="{{ url_for("admin.view_add_article") }}"> Add new article </a></button>
-    {% endif %}
+    <div class="container">
+        <div class="articles">
     {% if articles %}
-        <ul>
-        {% for article in articles %}
-            <li>   
-                <h2> <a href="{{ url_for("admin.view_add_article", art_id=article.id) }}"> {{ article.title }} </a> </h2>
-                <p> {{article.content | truncate(100) }} {# truncate, max.dlžka stringu a pridá na koniec ... #} 
-            </li>
-        {% endfor %}
-        </ul>
-        <ul class="paginate">
+    {% for article in articles %}
+    <article class="media pt-3">
+        <img class="mr-3" src={{ url_for("static", filename="img/placeholder.svg") }}>
+        <div class="media-body ">
+            <h3 class="mt-0">
+                <a href={{ url_for("blog.view_article", art_id=article.id) }}>
+                    {{ article.title }}
+                </a>
+            </h3>
+            {{ article.content | truncate(100)}}
+        </div> {# media body #}
+    </article>
+    {% endfor %}
+    </div>
+    </div>
 
+        {# PAGINATION #}
+        <ul class="pagination justify-content-center mt-3">
+
+        {# add previous button #}
         {% if paginate.has_prev %}
-            <li>
-                <a href={{url_for("blog.view_articles", page=paginate.prev_num)}}> <img src="../static/images/left.png"> </a>
+                    <li class="page-item">
+                <a class="page-link" href={{url_for("blog.view_articles", page=paginate.prev_num)}} >Previous</a>
             </li>
         {% endif %}
 
+
+        {# ADD NUMBERED LINKS #}
         {%- for page in paginate.iter_pages() %}
             {% if page %}
                 {% if page != paginate.page %}
-                    <li> <a href={{ url_for("blog.view_articles", page=page) }}> {{page }} </a></li>
+                                    <li class="page-item"> <a class="page-link" href={{ url_for("blog.view_articles", page=page) }}>{{page}}</a></li>
                 {% else %}
-                    <li> {{page}} </li>
+                                    <li class="page-item disabled"><a class="page-link">{{ page }}</a></li>
                 {% endif %}
             {% else %}
-                <li> ... </li>
+                            <li class="page-item"><span class="ellipsis"> ...</span></li>
             {% endif %}
         {%- endfor %}
-
+                {# add next button #}
         {% if paginate.has_next %}
-            <li>
-                <a href={{url_for("blog.view_articles", page=paginate.next_num)}}> <img src="../static/images/right.png"> </a>
+                    <li class="page-item">
+                <a class="page-link" href={{url_for("blog.view_articles", page=paginate.next_num)}} >Next</a>
             </li>
         {% endif %}
-
         </ul>
 
-
     {% else %}
-        <p> Žiadne články nemáme :( </p>
+        <p> No articles </p>
     {% endif %}
+
 {% endblock %}
+
