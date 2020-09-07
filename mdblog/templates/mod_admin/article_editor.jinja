@@ -2,7 +2,15 @@
 
 {% block title %} New Article {% endblock %}
 
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" type="text/css" href={{url_for("static", filename="stylesheets/simplemde.min.css")}}>
+    <script src={{url_for("static", filename="js/simplemde.min.js")}}></script>
+    <script src={{url_for("static", filename="js/editor.js")}}></script>
+{% endblock %}
+
 {% block main %}
+
 {% if article %}
 <form action="{{ url_for("admin.edit_article", art_id=article.id) }}" method="post">
 {% else %}
@@ -17,6 +25,7 @@
         {{ form.content.label }}
         {{ form.content() }}
     </div>
+    {{ form.html_render() }}
     <input type="submit" value="save">
 </form>
 

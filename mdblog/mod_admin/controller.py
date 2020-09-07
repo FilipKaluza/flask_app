@@ -53,7 +53,8 @@ def add_article():
     if add_form.validate():
         new_article = Article(
             title = add_form.title.data,
-            content = add_form.content.data)
+            content = add_form.content.data,
+            html_render = add_form.html_render.data)
         db.session.add(new_article)
         db.session.commit()
         flash(u"Article was added", category="alert-success")
@@ -65,10 +66,10 @@ def add_article():
 def view_article_editor(art_id):
     article = Article.query.filter_by(id = art_id).first()
     if article:
-        form = articleForm()
+        form = ArticleForm()
         form.title.data = article.title
         form.content.data = article.content
-        return render_template("article_editor.jinja", form=form, article=article)
+        return render_template("mod_admin/article_editor.jinja", form=form, article=article)
     return render_template("mod_blog/article_not_found.jinja", art_id=art_id)
 
 
@@ -77,14 +78,16 @@ def view_article_editor(art_id):
 def edit_article(art_id):
     article = Article.query.filter_by(id = art_id).first()
     if article:
-        edit_form = articleForm(request.form)
+        edit_form = ArticleForm(request.form)
         if edit_form.validate():
             article.title = edit_form.title.data
             article.content = edit_form.content.data
+            print(edit_form.title.data)
+            article.html_render = edit_form.html_render.data
             db.session.add(article)
             db.session.commit()
             flash("Changes was saved", "success")
-            return redirect(url_for("admin.view_article", art_id=art_id))
+            return redirect(url_for("blog.view_article", art_id=art_id))
 
 
 ## CHANGE PASSWORD
