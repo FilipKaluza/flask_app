@@ -20,12 +20,15 @@
     <div class="form-group">
         {{ form.title.label }}
         {{ form.title(class="form-control", placeholder="Article title") }}
+        
     </div>
     <div class="form-group">
         {{ form.content.label }}
         {{ form.content() }}
     </div>
-    {{ form.html_render() }}
+    <div class="form-group">
+        {{ form.html_render() }}
+    </div>
     <input type="submit" value="save">
 </form>
 

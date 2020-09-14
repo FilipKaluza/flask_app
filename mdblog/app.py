@@ -3,7 +3,7 @@ from .models import db
 from .mod_main.controller import main
 from .mod_blog.controller import blog
 from .mod_admin.controller import admin
-
+from .mod_main.forms import NewsletterForm 
 
 import os #pre configs
 
@@ -28,7 +28,10 @@ def Internal_server_error(error):
 def Internal_server_error(error):
     return render_template("errors/404.jinja"), 404
 
-
+#globálne dostupný newletterform
+@flask_app.context_processor
+def inject_newsletter_form():
+    return dict(newsletter_form = NewsletterForm())
 
 ## CLI COMMAND
 

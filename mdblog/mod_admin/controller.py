@@ -109,6 +109,9 @@ def change_password():
             db.session.commit()
             flash("Password was changed", category="success")
             return redirect(url_for("admin.view_admin"))
+        else:
+            flash(" Incorrect password, try again", "danger")
+            return redirect(url_for("admin.view_login"))
 
 
 @admin.route('/login/', methods=["GET"])
